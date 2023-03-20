@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Unit from '$lib/components/website/liste/Unit.svelte'
+	import List from '$lib/components/website/liste/List.svelte'
 </script>
 
-<div>
-	<Unit />
-</div>
+<List />

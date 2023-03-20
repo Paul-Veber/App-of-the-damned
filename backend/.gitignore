@@ -1,0 +1,4 @@
+.env
+/target
+/entity/target
+/migration/target

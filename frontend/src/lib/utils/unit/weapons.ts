@@ -6,21 +6,21 @@ export interface Special {
 	effect: availableLang
 }
 
-interface Object {
+export interface Item {
 	id: string
 	name: availableLang
 	description: availableLang
 	bonus?: Partial<Characteristics>
 	price: number
+	special?: Special[]
 }
 
-export interface Weapons extends Object {
-	special?: Special[]
-	twoHands?: boolean
+export interface Weapons extends Item {
+	wielding?: 'twoHands' | 'oneHand'
 	shield?: boolean
 }
 
-export interface BalisticWeapons extends Weapons {
+export interface BalisticWeapons extends Item {
 	range: number
 	strength: number
 }
@@ -65,7 +65,7 @@ export const heavyWeapon: Weapons = {
 	],
 	bonus: { strength: 2 },
 	price: 15,
-	twoHands: true
+	wielding: 'twoHands'
 }
 
 export const weaponList = {

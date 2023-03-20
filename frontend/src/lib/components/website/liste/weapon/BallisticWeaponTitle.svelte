@@ -8,7 +8,7 @@
 	export let weapon: BalisticWeapons
 </script>
 
-<div class="grid grid-cols-4">
+<div class="grid grid-cols-4 pl-2">
 	<span class="block mr-4"><Lang data={weapon.name} /></span>
 	<div class="block">
 		{#if 'strength' in weapon}<Strength />
