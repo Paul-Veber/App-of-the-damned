@@ -1,16 +1,38 @@
-use async_graphql::{Context, Object, Result};
+use async_graphql::{Context, Object, Result, Json};
 use entity::async_graphql::{self, InputObject, SimpleObject};
 use entity::unit;
 use entity::sea_orm::{ActiveModelTrait, Set};
+use serde::{Serialize, Deserialize};
 
 use crate::db::Database;
 
-// I normally separate the input types into separate files/modules, but this is just
-// a quick example.
+#[derive(SimpleObject, Serialize, Deserialize)]
+pub struct Characteristics {
+    pub movement: u8,
+    pub weapon_skill: u8,
+    pub ballistic_skill: u8,
+    pub strength: u8,
+    pub toughness: u8,
+    pub wounds: u8,
+    pub initiative: u8,
+    pub attacks: u8,
+    pub leadership: u8,
+    pub armor_save: u8,
+}
 
 #[derive(InputObject)]
 pub struct CreateUnitInput {
     pub name: String,
+    pub unit_type: String,
+    pub ballistic_weapon: String,
+    pub weapons: Vec<String>,
+    pub magic:Option<Vec<String>>, 
+    pub skills: Option<Vec<String>>,
+    pub experience: u32,
+    pub characteristics: Json<Characteristics>,
+    pub price: u32,
+    pub description: String,
+
 }
 
 #[derive(SimpleObject)]

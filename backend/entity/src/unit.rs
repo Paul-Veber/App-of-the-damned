@@ -1,7 +1,21 @@
 use async_graphql::*;
-use sea_orm::DeleteMany;
+use sea_orm::{DeleteMany, FromJsonQueryResult};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject)]
+pub struct Characteristics {
+   pub movement: u8,
+   pub weapon_skill: u8,
+   pub ballistic_skill: u8,
+   pub strength: u8,
+   pub toughness: u8,
+   pub wounds: u8,
+   pub initiative: u8,
+   pub attacks: u8,
+   pub leadership: u8,
+   pub armor_save: u8,
+}
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "unit")]
@@ -11,6 +25,16 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub name: String,
+    pub unit_type: String,
+    pub ballistic_weapon: String,
+    pub weapons: Vec<String>,
+    #[sea_orm(nullable)]
+    pub magic: Option<Vec<String>>, 
+    pub skills: Option<Vec<String>>,
+    pub experience: u32,
+    pub characteristics: Characteristics,
+    pub price: u32,
+    pub description: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]
