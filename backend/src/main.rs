@@ -1,5 +1,6 @@
 mod db;
 mod graphql;
+pub mod utils;
 
 use entity::async_graphql;
 

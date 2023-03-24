@@ -3,7 +3,8 @@ use sea_orm::{DeleteMany, FromJsonQueryResult};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject, InputObject)]
+#[graphql(input_name = "CharacteristicsInput")]
 pub struct Characteristics {
    pub movement: u8,
    pub weapon_skill: u8,
@@ -25,15 +26,15 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub name: String,
+    pub rank: String,
     pub unit_type: String,
     pub ballistic_weapon: String,
     pub weapons: Vec<String>,
-    #[sea_orm(nullable)]
     pub magic: Option<Vec<String>>, 
     pub skills: Option<Vec<String>>,
-    pub experience: u32,
+    pub experience: i32,
     pub characteristics: Characteristics,
-    pub price: u32,
+    pub price: i32,
     pub description: String,
 }
 

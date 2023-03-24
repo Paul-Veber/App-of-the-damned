@@ -1,39 +1,41 @@
-use async_graphql::{Context, Object, Result, Json};
+use async_graphql::{Context, Object, Result};
 use entity::async_graphql::{self, InputObject, SimpleObject};
-use entity::unit;
+use entity::unit::{self, Characteristics};
 use entity::sea_orm::{ActiveModelTrait, Set};
-use serde::{Serialize, Deserialize};
 
 use crate::db::Database;
-
-#[derive(SimpleObject, Serialize, Deserialize)]
-pub struct Characteristics {
-    pub movement: u8,
-    pub weapon_skill: u8,
-    pub ballistic_skill: u8,
-    pub strength: u8,
-    pub toughness: u8,
-    pub wounds: u8,
-    pub initiative: u8,
-    pub attacks: u8,
-    pub leadership: u8,
-    pub armor_save: u8,
-}
+use crate::utils::mutation_value_check::mutation_value_check;
 
 #[derive(InputObject)]
 pub struct CreateUnitInput {
     pub name: String,
     pub unit_type: String,
+    pub rank: String,
     pub ballistic_weapon: String,
     pub weapons: Vec<String>,
     pub magic:Option<Vec<String>>, 
     pub skills: Option<Vec<String>>,
-    pub experience: u32,
-    pub characteristics: Json<Characteristics>,
-    pub price: u32,
+    pub experience: i32,
+    pub characteristics: Characteristics,
+    pub price: i32,
     pub description: String,
-
 }
+
+#[derive(InputObject)]
+pub struct UpdateUnitInput {
+    pub name: Option<String>,
+    pub unit_type: Option<String>,
+    pub rank: Option<String>,
+    pub ballistic_weapon: Option<String>,
+    pub weapons: Option<Vec<String>>,
+    pub magic: Option<Option<Vec<String>>>, 
+    pub skills: Option<Option<Vec<String>>>,
+    pub experience: Option<i32>,
+    pub characteristics: Option<Characteristics>,
+    pub price: Option<i32>,
+    pub description: Option<String>,
+}
+
 
 #[derive(SimpleObject)]
 pub struct DeleteResult {
@@ -55,10 +57,49 @@ impl UnitMutation {
 
         let unit = unit::ActiveModel {
             name: Set(input.name),
+            unit_type: Set(input.unit_type),
+            rank: Set(input.rank),
+            ballistic_weapon: Set(input.ballistic_weapon),
+            weapons: Set(input.weapons),
+            magic: Set(input.magic),
+            skills: Set(input.skills),
+            experience: Set(input.experience),
+            characteristics: Set(input.characteristics),
+            price: Set(input.price),
+            description: Set(input.description),
             ..Default::default()
         };
 
         Ok(unit.insert(db.get_connection()).await?)
+    }
+
+    pub async fn update_unit(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+        input: UpdateUnitInput
+        ) -> Result<unit::Model> {
+        
+        let db = ctx.data::<Database>().unwrap();
+
+        let unit: Option<_> = unit::Entity::find_by_id(id).one(db.get_connection()).await?;
+
+        let mut unit: unit::ActiveModel = unit.unwrap().into();
+
+
+        unit.name = mutation_value_check(input.name, unit.name);
+        unit.unit_type = mutation_value_check(input.unit_type, unit.unit_type);
+        unit.rank = mutation_value_check(input.rank, unit.rank);
+        unit.ballistic_weapon = mutation_value_check(input.ballistic_weapon, unit.ballistic_weapon);
+        unit.weapons = mutation_value_check(input.weapons, unit.weapons);
+        unit.magic = mutation_value_check(input.magic, unit.magic);
+        unit.skills = mutation_value_check(input.skills, unit.skills);
+        unit.experience = mutation_value_check(input.experience, unit.experience);
+        unit.characteristics = mutation_value_check(input.characteristics, unit.characteristics);
+        unit.price = mutation_value_check(input.price, unit.price);
+        unit.description = mutation_value_check(input.description, unit.description);
+       
+        Ok(unit.update(db.get_connection()).await?)
     }
 
     pub async fn delete_unit(&self, ctx: &Context<'_>, id: i32) -> Result<DeleteResult> {
