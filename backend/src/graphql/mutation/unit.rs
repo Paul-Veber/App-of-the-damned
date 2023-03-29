@@ -2,9 +2,12 @@ use async_graphql::{Context, Object, Result};
 use entity::async_graphql::{self, InputObject, SimpleObject};
 use entity::unit::{self, Characteristics};
 use entity::sea_orm::{ActiveModelTrait, Set};
+use sea_orm::ActiveValue::NotSet;
 
 use crate::db::Database;
 use crate::utils::mutation_value_check::mutation_value_check;
+
+use super::characteristics::{update_characteristics, CharacteristicsUpdate};
 
 #[derive(InputObject)]
 pub struct CreateUnitInput {
@@ -31,11 +34,10 @@ pub struct UpdateUnitInput {
     pub magic: Option<Option<Vec<String>>>, 
     pub skills: Option<Option<Vec<String>>>,
     pub experience: Option<i32>,
-    pub characteristics: Option<Characteristics>,
+    pub characteristics: Option<CharacteristicsUpdate>,
     pub price: Option<i32>,
     pub description: Option<String>,
 }
-
 
 #[derive(SimpleObject)]
 pub struct DeleteResult {
@@ -86,18 +88,22 @@ impl UnitMutation {
 
         let mut unit: unit::ActiveModel = unit.unwrap().into();
 
+        let updated_charac = match input.characteristics {
+            Some(charac) => Set(update_characteristics(charac, unit.characteristics)),
+            None => NotSet
+        };
 
-        unit.name = mutation_value_check(input.name, unit.name);
-        unit.unit_type = mutation_value_check(input.unit_type, unit.unit_type);
-        unit.rank = mutation_value_check(input.rank, unit.rank);
-        unit.ballistic_weapon = mutation_value_check(input.ballistic_weapon, unit.ballistic_weapon);
-        unit.weapons = mutation_value_check(input.weapons, unit.weapons);
-        unit.magic = mutation_value_check(input.magic, unit.magic);
-        unit.skills = mutation_value_check(input.skills, unit.skills);
-        unit.experience = mutation_value_check(input.experience, unit.experience);
-        unit.characteristics = mutation_value_check(input.characteristics, unit.characteristics);
-        unit.price = mutation_value_check(input.price, unit.price);
-        unit.description = mutation_value_check(input.description, unit.description);
+        unit.name = mutation_value_check(input.name); 
+        unit.unit_type = mutation_value_check(input.unit_type);
+        unit.rank = mutation_value_check(input.rank);
+        unit.ballistic_weapon = mutation_value_check(input.ballistic_weapon);
+        unit.weapons = mutation_value_check(input.weapons);
+        unit.magic = mutation_value_check(input.magic);
+        unit.skills = mutation_value_check(input.skills);
+        unit.experience = mutation_value_check(input.experience);
+        unit.characteristics = updated_charac;
+        unit.price = mutation_value_check(input.price);
+        unit.description = mutation_value_check(input.description);
        
         Ok(unit.update(db.get_connection()).await?)
     }

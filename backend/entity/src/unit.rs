@@ -49,6 +49,7 @@ impl RelationTrait for Relation {
 
 impl ActiveModelBehavior for ActiveModel {}
 
+
 impl Entity {
     pub fn find_by_id(id: i32) -> Select<Entity> {
         Self::find().filter(Column::Id.eq(id))
