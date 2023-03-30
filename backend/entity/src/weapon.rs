@@ -1,7 +1,9 @@
-use async_graphql::*;
+use async_graphql::{SimpleObject, InputObject};
 use sea_orm::DeleteMany;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+
+use crate::unit::Characteristics;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject, InputObject)]
 #[graphql(input_name = "MultiLangInput")]
@@ -10,14 +12,34 @@ pub struct MultiLang {
     pub eng: Option<String>
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject, InputObject)]
+#[graphql(input_name = "Special")]
+pub struct Special {
+    name: MultiLang,
+    effect: MultiLang
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject)]
+pub struct SpecialField {
+    special: Vec<Special>
+}
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "weapon")]
 #[graphql(concrete(name = "Weapon", params()))]
 pub struct Model {
-    #[sea_orm(primary_key)]
+    #[sea_orm(primary_key, auto_increment = false)]
     #[serde(skip_deserializing)]
     pub id: String,
     pub name: MultiLang,
+    pub description: MultiLang,
+    pub bonus: Option<Characteristics>,
+    pub price: i32,
+    pub special: Option<SpecialField>,
+    pub wielding: Option<String>,
+    pub shield: Option<bool>,
+    pub range: Option<i32>,
+    pub strength: Option<i32>
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]
@@ -41,3 +63,12 @@ impl Entity {
     }
 }
 
+impl Related<super::unit::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::weapon_unit::Relation::Unit.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::weapon_unit::Relation::Weapon.def().rev())
+    }
+}

@@ -49,7 +49,6 @@ impl RelationTrait for Relation {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-
 impl Entity {
     pub fn find_by_id(id: i32) -> Select<Entity> {
         Self::find().filter(Column::Id.eq(id))
@@ -58,4 +57,15 @@ impl Entity {
     pub fn delete_by_id(id: i32) -> DeleteMany<Entity> {
         Self::delete_many().filter(Column::Id.eq(id))
     }
+}
+
+impl Related<super::weapon::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::weapon_unit::Relation::Weapon.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::weapon_unit::Relation::Unit.def().rev())
+    }
+
 }
