@@ -3,8 +3,8 @@ use entity::async_graphql::{self, InputObject, SimpleObject};
 use entity::unit::{self, Characteristics};
 use entity::sea_orm::{ActiveModelTrait, Set};
 use sea_orm::ActiveValue::NotSet;
+use entity::db::Database;
 
-use crate::db::Database;
 use crate::utils::mutation_value_check::mutation_value_check;
 
 use super::characteristics::{update_characteristics, CharacteristicsUpdate};
@@ -15,7 +15,7 @@ pub struct CreateUnitInput {
     pub unit_type: String,
     pub rank: String,
     pub ballistic_weapon: String,
-    pub weapons: Vec<String>,
+    // pub weapons: Vec<String>,
     pub magic:Option<Vec<String>>, 
     pub skills: Option<Vec<String>>,
     pub experience: i32,
@@ -30,7 +30,7 @@ pub struct UpdateUnitInput {
     pub unit_type: Option<String>,
     pub rank: Option<String>,
     pub ballistic_weapon: Option<String>,
-    pub weapons: Option<Vec<String>>,
+    // pub weapons: Option<Vec<String>>,
     pub magic: Option<Option<Vec<String>>>, 
     pub skills: Option<Option<Vec<String>>>,
     pub experience: Option<i32>,
@@ -62,7 +62,7 @@ impl UnitMutation {
             unit_type: Set(input.unit_type),
             rank: Set(input.rank),
             ballistic_weapon: Set(input.ballistic_weapon),
-            weapons: Set(input.weapons),
+            // weapons: Set(input.weapons),
             magic: Set(input.magic),
             skills: Set(input.skills),
             experience: Set(input.experience),
@@ -97,7 +97,7 @@ impl UnitMutation {
         unit.unit_type = mutation_value_check(input.unit_type);
         unit.rank = mutation_value_check(input.rank);
         unit.ballistic_weapon = mutation_value_check(input.ballistic_weapon);
-        unit.weapons = mutation_value_check(input.weapons);
+        // unit.weapons = mutation_value_check(input.weapons);
         unit.magic = mutation_value_check(input.magic);
         unit.skills = mutation_value_check(input.skills);
         unit.experience = mutation_value_check(input.experience);

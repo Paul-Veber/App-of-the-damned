@@ -1,8 +1,8 @@
 use async_graphql::{EmptySubscription, Schema};
 use entity::async_graphql;
+use entity::db::Database;
 
 use crate::{
-    db::Database,
     graphql::{mutation::Mutation, query::Query},
 };
 

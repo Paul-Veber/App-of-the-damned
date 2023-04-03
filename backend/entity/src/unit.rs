@@ -2,6 +2,10 @@ use async_graphql::*;
 use sea_orm::{DeleteMany, FromJsonQueryResult};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use weapon::MultiLang;
+
+use crate::db::Database;
+use crate::weapon;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult, SimpleObject, InputObject)]
 #[graphql(input_name = "CharacteristicsInput")]
@@ -20,7 +24,7 @@ pub struct Characteristics {
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "unit")]
-#[graphql(concrete(name = "Unit", params()))]
+#[graphql(name = "Unit", complex)]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
@@ -29,7 +33,7 @@ pub struct Model {
     pub rank: String,
     pub unit_type: String,
     pub ballistic_weapon: String,
-    pub weapons: Vec<String>,
+    // pub weapons: Vec<String>,
     pub magic: Option<Vec<String>>, 
     pub skills: Option<Vec<String>>,
     pub experience: i32,
@@ -38,8 +42,19 @@ pub struct Model {
     pub description: String,
 }
 
+#[ComplexObject]
+impl Model {
+  async fn weapon(&self, ctx: &Context<'_>) -> Result<Vec<weapon::Model>> {
+      let db = ctx.data::<Database>().unwrap();
+
+      Ok(self.find_related(weapon::Entity).all(db.get_connection()).await.map_err(|e| e.to_string())?)
+  }
+}
+
+
 #[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
+pub enum Relation {
+}
 
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {

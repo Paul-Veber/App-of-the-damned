@@ -1,7 +1,6 @@
-use async_graphql::{Context, Object, Result};
+use async_graphql::{Context, Object, Result, ComplexObject};
 use entity::{async_graphql, unit, sea_orm::EntityTrait};
-
-use crate::db::Database;
+use entity::db::Database;
 
 #[derive(Default)]
 pub struct UnitQuery;
@@ -26,3 +25,13 @@ impl UnitQuery {
             .map_err(|e| e.to_string())?)
     }
 }
+
+
+// #[ComplexObject]
+// impl unit::Model {
+//     pub async fn weapons(&self, ctx: &Context<'_>) -> Result<Vec<weapon::Model>, DbErr> {
+
+//         
+//    }
+// }
+

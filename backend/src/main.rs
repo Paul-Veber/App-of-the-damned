@@ -1,4 +1,3 @@
-mod db;
 mod graphql;
 pub mod utils;
 
